@@ -31,7 +31,7 @@ enum carbonScopeLevel {
     string ghgOrganizationName,
     bytes privateHash,
  }
- mapping(string => ghgOrganization) public registeredGHGOrg;
+ mapping(string => ghgOrganization) private registeredGHGOrg;
 
  //Tokenized Carbon Emissions Data
  struct emissionsData {
@@ -72,6 +72,7 @@ enum carbonScopeLevel {
    address addedBy,
    string subjectGHGOrgID,
    string verificationOrgID,
+   uint256 acknowledgedOn,
  }
  emissionsVerifier[] public emissionsVerifiers;
  mapping(address => emissionsVerifier) public emissionsVerifiersByAddress;
@@ -172,12 +173,17 @@ enum carbonScopeLevel {
  }
 
  function requestVerifierRole(address _requestedVerifierDID){
-
+    requestedVerifier = new emissionsVerifier();
+    emissionsVerifiersByAddress[_requestedVerifierDID]
  }
 
- function approveVerifierRole(address _verifierDID){
-   emissionsVerifier approvedVerifier = emissionsVerifiersByAddress[_verifierDID];
-
+ function approveVerifierRole(address _verifierDID) onlyAuthority {
+   require(_verifierDID != msg.sender, "Sorry. Cannot self-approve verifier role.");
+   approvedVerifier = emissionsVerifiersByAddress[_verifierDID];
+   approvedVerifier.acknowledgedVerifer = true;
+   approvedVerifier.acknowledgedOn = block.timestamp;
+   approvedVerifier.acknowledgedBy = msg.sender;
+   emissionsVerifiersByAddress[_verifierDID] = approvedVerifier;
  }
 
  //Role-based modifiers
@@ -210,5 +216,6 @@ enum carbonScopeLevel {
       isAuthority = true;
    }
    require(isAuthority == true, "Data steward or emissions verifier role needs approval");
+   _;
  }
 }
