@@ -5,6 +5,8 @@ import verifierContract from "./verifierContract.sol";
 
 contract emissionsNFT is ERC721 {
  address public owner;
+ uint32 latestTokenID;
+ bool readyToMint;
  constructor() ERC721("EmissionsNFT", "CO2eNFT") {
    owner = msg.sender;
    defaultDataSteward = new dataSteward();
@@ -12,7 +14,24 @@ contract emissionsNFT is ERC721 {
    defaultDataSteward.acknowledDataSteward = true;
    dataStewards.push(defaultDataSteward);
    dataStewardAddress[msg.sender] = defaultDataSteward;
+   latestTokenID = 1;
+   readyToMint = false;
  }
+
+enum carbonScopeLevel {
+  Unknown,
+  Scope1,
+  Scope2,
+  Scope3
+}
+
+ //GHG Organization
+ struct ghgOrganization {
+    string ghgOrganizationID,
+    string ghgOrganizationName,
+    bytes privateHash,
+ }
+ mapping(string => ghgOrganization) public registeredGHGOrg;
 
  //Tokenized Carbon Emissions Data
  struct emissionsData {
@@ -26,6 +45,8 @@ contract emissionsNFT is ERC721 {
     bytes32 sapcapDataHash,
     string emissionsVaultID,
     uint16 adjustmentID,
+    string reportingGHGOrgID,
+    carbonScopeLevel scopeLevel,
  }
  emissionsData[] public publicEmissionsDisclosure;
  mapping(uint32 => emissionsData) public latestePedByTokenID;
@@ -49,6 +70,8 @@ contract emissionsNFT is ERC721 {
    address emissionsVerifierAddress,
    bool acknowledgedVerifer,
    address addedBy,
+   string subjectGHGOrgID,
+   string verificationOrgID,
  }
  emissionsVerifier[] public emissionsVerifiers;
  mapping(address => emissionsVerifier) public emissionsVerifiersByAddress;
@@ -58,14 +81,41 @@ contract emissionsNFT is ERC721 {
    address dataStewardAddress,
    bool acknowledDataSteward,
    address addedBy,
+   string ghgOrgID,
  }
  dataSteward[] public dataStewards;
  mapping(address => dataSteward) public dataStewardsByAddress;
 
+ function mintEmissionsNFT(address _to) onlyDataSteward {
+  require(readyToMint == true, "Contract is not ready to mint. Please complete configuration");
+  require(msg.sender == _to, "Data stewards must own the initial mint");
+  latestTokenID++;
+ }
+
+ function mint(address _to, uint32 _tokenID) {
+  _mint(_to, _tokenID);
+ }
+
+ function defineGHGOrg(string _ghgOrganizationID, string _ghgOrganizationName) onlyDataSteward {
+    definedGHGOrg = new ghgOrganization();
+    definedGHGOrg.ghgOrganizationID = _ghgOrganizationID;
+    definedGHGOrg.ghgOrganizationName = _ghgOrganizationName;
+    registeredGHGOrg[_ghgOrganizationID] = definedGHGOrg;
+ }
+
 // Carbon Emissions Data Maintenance / Data Stewardship
- function addEmissionsData(uint32 _targetToken, uint256 _fromDateTime, uint256 _toDateTime, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string _emissionsVaultID) {
+ function addEmissionsData(uint32 _targetToken, uint256 _fromDateTime, uint256 _toDateTime, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string _emissionsVaultID, string _ghgOrgID, uint _scopeLevel) {
+    // token must exist
+    require(_exists(_targetToken), "Token does not exist!" );
+
     //validate the from and to timestamp
     require(_toDateTime > _fromDateTime, "from-datetime must be less than to-datetime");
+
+    //ensure a valid configured org id is added
+    require(registeredGHGOrg[_ghgOrgID], "GHG Organization is unknown. Please register it");
+
+    //ensure valid scope level is passed
+    require(_scopeLevel <= carbonScopeLevel.Scope3, "Emissions data must be classified as scopes 1-3 or as unknown(0)");
     
     //see if this emissions data was already maintained
     if(pedsByToken[_targetToken].length == 0) {
@@ -79,9 +129,13 @@ contract emissionsNFT is ERC721 {
         newEmissionsData.protectedIPFSCID = _protectedIPFSCID;
         newEmissionsData.sapcapDataHash = _sapcapDataHash;
         newEmissionsData.emissionsVaultID = _emissionsVaultID;
+        newEmissionsData.ghgOrganizationID = _ghgOrgID;
         newEmissionsData.adjustmentID = 0;
         publicEmissionsDisclosure.push(newEmissionsData);
     } else {
+        existingEmissionsData = pedsByToken[_targetToken];
+        require(existingEmissionsData.fromDateTime == _fromDateTime, "From Date Time must remain the same");
+        require(existingEmissionsData.toDateTime == _toDateTime, "To Date Time must remain the same");
         adjustEmissionsData(_targetToken, _co2eAmount, _emissionsOrigin, _protectedIPFSCID, _protectedIPFSCID, _sapcapDataHash, _emissionsVaultID);
     }
 
@@ -97,6 +151,7 @@ contract emissionsNFT is ERC721 {
         adjustedEmissionsData.protectedIPFSCID = _protectedIPFSCID;
         adjustedEmissionsData.sapcapDataHash = _sapcapDataHash;
         adjustedEmissionsData.emissionsVaultID = _emissionsVaultID;
+        adjustedEmissionsData.ghgOrganizationID = _ghgOrgID;
         adjustedEmissionsData.adjustmentID = pedsByToken[_targetToken].length;
         publicEmissionsDisclosure.push(adjustedEmissionsData);
  }
