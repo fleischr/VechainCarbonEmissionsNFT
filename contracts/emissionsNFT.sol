@@ -73,6 +73,7 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
  struct emissionsVerifier {
    address emissionsVerifierAddress,
    bool acknowledgedVerifer,
+   address requestedBy,
    address addedBy,
    string subjectGHGOrgID,
    string verificationOrgID,
@@ -186,12 +187,15 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
    emit emissionsTokenVerified(address(this), _targetToken, _currentAdjustmentID, tokenVerificationID, _verificationID);
  }
 
- function requestVerifierRole(address _requestedVerifierDID){
+ function requestVerifierRole(address _requestedVerifierDID, string _ghgOrgID){
     requestedVerifier = new emissionsVerifier();
+    requestedVerifier.verifierDID = _requestedVerifierDID;
+    requestedVerifer.requestedBy = msg.sender;
+    requestedVerifier.acknowledgedVerifer = false;
     emissionsVerifiersByAddress[_requestedVerifierDID] = requestedVerifier;
  }
 
- function approveVerifierRole(address _verifierDID) onlyAuthority {
+ function approveVerifierRole(address _verifierDID, string _ghgOrgID) onlyAuthority {
    require(_verifierDID != msg.sender, "Sorry. Cannot self-approve verifier role.");
    approvedVerifier = emissionsVerifiersByAddress[_verifierDID];
    approvedVerifier.acknowledgedVerifer = true;
