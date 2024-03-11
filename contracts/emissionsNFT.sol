@@ -10,7 +10,7 @@ contract emissionsNFT is ERC721 {
  VerifySignature verifier;
  constructor() ERC721("EmissionsNFT", "CO2eNFT") {
    owner = msg.sender;
-   dataSteward defaultDataSteward = new dataSteward();
+   dataSteward storage defaultDataSteward = new dataSteward();
    defaultDataSteward.dataStewardAddress = msg.sender;
    defaultDataSteward.acknowledDataSteward = true;
    dataStewards.push(defaultDataSteward);
@@ -106,8 +106,8 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
   _mint(_to, _tokenID);
  }
 
- function defineGHGOrg(string _ghgOrganizationID, string _ghgOrganizationName) public onlyDataSteward {
-    ghgOrganization definedGHGOrg = new ghgOrganization();
+ function defineGHGOrg(string calldata _ghgOrganizationID, string calldata _ghgOrganizationName) public onlyDataSteward {
+    ghgOrganization storage definedGHGOrg = new ghgOrganization();
     definedGHGOrg.ghgOrganizationID = _ghgOrganizationID;
     definedGHGOrg.ghgOrganizationName = _ghgOrganizationName;
     registeredGHGOrg[_ghgOrganizationID] = definedGHGOrg;
@@ -115,7 +115,7 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
  }
 
 // Carbon Emissions Data Maintenance / Data Stewardship
- function addEmissionsData(uint32 _targetToken, uint256 _fromDateTime, uint256 _toDateTime, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string _emissionsVaultID, string _ghgOrgID, uint _scopeLevel) public returns (bool) {
+ function addEmissionsData(uint32 _targetToken, uint256 _fromDateTime, uint256 _toDateTime, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string calldata _emissionsVaultID, string calldata _ghgOrgID, uint _scopeLevel) public returns (bool) {
     // token must exist
     require(_exists(_targetToken), "Token does not exist!" );
 
@@ -130,7 +130,7 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
     
     //see if this emissions data was already maintained
     if(latestePedByTokenID[_targetToken].length == 0) {
-        emissionsData newEmissionsData = new emissionsData();
+        emissionsData storage newEmissionsData = new emissionsData();
         newEmissionsData.tokenID = _targetToken;
         newEmissionsData.fromDateTime = _fromDateTime;
         newEmissionsData.toDateTime = _toDateTime;
@@ -145,15 +145,15 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
         publicEmissionsDisclosure.push(newEmissionsData);
         latestePedByTokenID[_targetToken] = newEmissionsData;
     } else {
-        emissionsData existingEmissionsData = latestePedByTokenID[_targetToken];
+        emissionsData storage existingEmissionsData = latestePedByTokenID[_targetToken];
         require(existingEmissionsData.fromDateTime == _fromDateTime, "From Date Time must remain the same");
         require(existingEmissionsData.toDateTime == _toDateTime, "To Date Time must remain the same");
         adjustEmissionsData(existingEmissionsData, _targetToken, _co2eAmount, _emissionsOrigin, _protectedIPFSCID, _protectedIPFSCID, _sapcapDataHash, _emissionsVaultID);
     }
     return true;
  }
- function adjustEmissionsData(emissionsData _existingEmissions, uint32 _targetToken, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string _emissionsVaultID, string _ghgOrgID, uint _scopeLevel) private returns (bool) {
-        emissionsData adjustedEmissionsData = new emissionsData();
+ function adjustEmissionsData(emissionsData calldata _existingEmissions, uint32 _targetToken, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string calldata _emissionsVaultID, string calldata _ghgOrgID, uint _scopeLevel) private returns (bool) {
+        emissionsData storage adjustedEmissionsData = new emissionsData();
         adjustedEmissionsData.tokenID = _targetToken;
         adjustedEmissionsData.fromDateTime = _existingEmissions.fromDateTime;
         adjustedEmissionsData.toDateTime = _existingEmissions.toDateTime;
@@ -170,12 +170,12 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
  }
 
  //Carbon Emissions Data Verification
- function addEmissionsVerification(uint32 _targetToken, uint16 _tokenVerificationID, address _verifierDID, string memory _message, bytes _verifierSignature, uint256 _verifiedOn, uint16 _currentAdjustmentID) public onlyEmissionsVerifier {
+ function addEmissionsVerification(uint32 _targetToken, uint16 _tokenVerificationID, address _verifierDID, string memory _message, bytes calldata _verifierSignature, uint256 _verifiedOn, uint16 _currentAdjustmentID) public onlyEmissionsVerifier {
    bool isValidVerification = false;
    isValidVerification = verifier.verify(_verifierDID, _message, _verifierSignature);
    require(isValidVerification == true, "Emission Data Verification is invalid");
 
-   emissionsVerification newPEV = new emissionsVerification();
+   emissionsVerification storage newPEV = new emissionsVerification();
    newPEV.tokenID = _targetToken;
    uint16 tokenVerificationID = pevsByTokenID[_targetToken].length;
    newPEV.verifierDID = _verifierDID;
@@ -188,17 +188,17 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
    emit emissionsTokenVerified(address(this), _targetToken, _currentAdjustmentID, tokenVerificationID, _verifierDID);
  }
 
- function requestVerifierRole(address _requestedVerifierDID, string _ghgOrgID) public{
-    emissionsVerifier requestedVerifier = new emissionsVerifier();
+ function requestVerifierRole(address _requestedVerifierDID, string calldata _ghgOrgID) public{
+    emissionsVerifier storage requestedVerifier = new emissionsVerifier();
     requestedVerifier.verifierDID = _requestedVerifierDID;
     requestedVerifier.requestedBy = msg.sender;
     requestedVerifier.acknowledgedVerifer = false;
     emissionsVerifiersByAddress[_requestedVerifierDID] = requestedVerifier;
  }
 
- function approveVerifierRole(address _verifierDID, string _ghgOrgID) public onlyAuthority {
+ function approveVerifierRole(address _verifierDID, string calldata _ghgOrgID) public onlyAuthority {
    require(_verifierDID != msg.sender, "Sorry. Cannot self-approve verifier role.");
-   emissionsVerifier approvedVerifier = emissionsVerifiersByAddress[_verifierDID];
+   emissionsVerifier storage approvedVerifier = emissionsVerifiersByAddress[_verifierDID];
    approvedVerifier.acknowledgedVerifer = true;
    approvedVerifier.acknowledgedOn = block.timestamp;
    approvedVerifier.acknowledgedBy = msg.sender;
@@ -207,13 +207,13 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
 
  //Role-based modifiers
  modifier onlyEmissionsVerifier() {
-   emissionsVerifier emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];
+   emissionsVerifier memory emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];
    require(emissionsVerifierLookup.acknowledDataSteward == true, "Emissions Verifier Role needs approval");
    _;
  }
 
  modifier onlyDataSteward() {
-   dataSteward dataStewardLookup = dataStewardsByAddress[msg.sender];
+   dataSteward memory dataStewardLookup = dataStewardsByAddress[msg.sender];
    require(dataStewardLookup.acknowledDataSteward == true, "Data steward role needs approval");
    _;
  }
@@ -227,8 +227,8 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
  //either data stewards or emissions verifiers
  modifier onlyAuthority() {
    bool isAuthority = false;
-   emissionsVerifier emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];
-   dataSteward dataStewardLookup = dataStewardsByAddress[msg.sender];
+   emissionsVerifier memory emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];
+   dataSteward memory dataStewardLookup = dataStewardsByAddress[msg.sender];
    if(emissionsVerifierLookup.acknowledDataSteward == true || dataStewardLookup.acknowledDataSteward == true){
       isAuthority = true;
    }
