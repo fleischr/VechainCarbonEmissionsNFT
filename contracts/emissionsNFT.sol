@@ -10,7 +10,7 @@ contract emissionsNFT is ERC721 {
  VerifySignature verifier;
  constructor() ERC721("EmissionsNFT", "CO2eNFT") {
    owner = msg.sender;
-   dataSteward storage defaultDataSteward = new dataSteward();
+   dataSteward memory defaultDataSteward;
    defaultDataSteward.dataStewardAddress = msg.sender;
    defaultDataSteward.acknowledDataSteward = true;
    dataStewards.push(defaultDataSteward);
@@ -33,6 +33,7 @@ enum carbonScopeLevel {
     bytes privateHash;
  }
  mapping(string => ghgOrganization) private registeredGHGOrg;
+ mapping(string => bool) private isGHGOrg;
 
  //Tokenized Carbon Emissions Data
  struct emissionsData {
@@ -45,12 +46,13 @@ enum carbonScopeLevel {
     bytes32 protectedIPFSCID;
     bytes32 sapcapDataHash;
     string emissionsVaultID;
-    uint16 adjustmentID;
+    uint256 adjustmentID;
     string reportingGHGOrgID;
     carbonScopeLevel scopeLevel;
  }
  emissionsData[] public publicEmissionsDisclosure;
- mapping(uint32 => emissionsData) public latestePedByTokenID;
+ mapping(uint32 => emissionsData[]) public allPedsByTokenID;
+ mapping(uint32 => emissionsData) public latestPedByTokenID;
  mapping(uint32 => emissionsData) public latestVerifiedPedByTokenID;
  
  //Carbon Emissions Verification
@@ -59,7 +61,8 @@ enum carbonScopeLevel {
     uint16 tokenVerificationID;
     address verifierDID;
     bytes verifierSignature;
-    uint256 verifiedOnDateTime;
+    uint256 verifiedOnDateTime1;
+    uint256 verifiedOnDateTime2;
     uint16 verificationCount;
     uint16 currentAdjustmentID;
  }
@@ -67,7 +70,7 @@ enum carbonScopeLevel {
  mapping(uint32 => emissionsVerification[]) public pevsByTokenID;
  mapping(uint32 => emissionsVerification) public latestPevByTokenID;
 
-event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 adjustmentID, uint16 tokenVerificationID, address verifierDID);
+event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 adjustmentID, uint256 tokenVerificationID, address verifierDID);
  
  //Carbon Emissions Verifiers
  struct emissionsVerifier {
@@ -92,7 +95,7 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
  dataSteward[] public dataStewards;
  mapping(address => dataSteward) public dataStewardsByAddress;
 
- function determineMintReadiness() public returns (bool) {
+ function determineMintReadiness() public view returns (bool) {
     return readyToMint;
  }
 
@@ -107,7 +110,7 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
  }
 
  function defineGHGOrg(string calldata _ghgOrganizationID, string calldata _ghgOrganizationName) public onlyDataSteward {
-    ghgOrganization storage definedGHGOrg = new ghgOrganization();
+    ghgOrganization memory definedGHGOrg;
     definedGHGOrg.ghgOrganizationID = _ghgOrganizationID;
     definedGHGOrg.ghgOrganizationName = _ghgOrganizationName;
     registeredGHGOrg[_ghgOrganizationID] = definedGHGOrg;
@@ -115,7 +118,7 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
  }
 
 // Carbon Emissions Data Maintenance / Data Stewardship
- function addEmissionsData(uint32 _targetToken, uint256 _fromDateTime, uint256 _toDateTime, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string calldata _emissionsVaultID, string calldata _ghgOrgID, uint _scopeLevel) public returns (bool) {
+ function addEmissionsData(uint32 _targetToken, uint256 _fromDateTime, uint256 _toDateTime, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string calldata _emissionsVaultID, string calldata _ghgOrgID, carbonScopeLevel _scopeLevel) public returns (bool) {
     // token must exist
     require(_exists(_targetToken), "Token does not exist!" );
 
@@ -123,14 +126,14 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
     require(_toDateTime > _fromDateTime, "from-datetime must be less than to-datetime");
 
     //ensure a valid configured org id is added
-    require(registeredGHGOrg[_ghgOrgID], "GHG Organization is unknown. Please register it");
+    require(isGHGOrg[_ghgOrgID] == true, "GHG Organization is unknown. Please register it");
 
     //ensure valid scope level is passed
     require(_scopeLevel <= carbonScopeLevel.Scope3, "Emissions data must be classified as scopes 1-3 or as unknown(0)");
     
     //see if this emissions data was already maintained
-    if(latestePedByTokenID[_targetToken].length == 0) {
-        emissionsData storage newEmissionsData = new emissionsData();
+    if(allPedsByTokenID[_targetToken].length == 0) {
+        emissionsData memory newEmissionsData;
         newEmissionsData.tokenID = _targetToken;
         newEmissionsData.fromDateTime = _fromDateTime;
         newEmissionsData.toDateTime = _toDateTime;
@@ -140,20 +143,20 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
         newEmissionsData.protectedIPFSCID = _protectedIPFSCID;
         newEmissionsData.sapcapDataHash = _sapcapDataHash;
         newEmissionsData.emissionsVaultID = _emissionsVaultID;
-        newEmissionsData.ghgOrganizationID = _ghgOrgID;
+        newEmissionsData.reportingGHGOrgID = _ghgOrgID;
         newEmissionsData.adjustmentID = 0;
         publicEmissionsDisclosure.push(newEmissionsData);
-        latestePedByTokenID[_targetToken] = newEmissionsData;
+        latestPedByTokenID[_targetToken] = newEmissionsData;
     } else {
-        emissionsData storage existingEmissionsData = latestePedByTokenID[_targetToken];
+        emissionsData storage existingEmissionsData = latestPedByTokenID[_targetToken];
         require(existingEmissionsData.fromDateTime == _fromDateTime, "From Date Time must remain the same");
         require(existingEmissionsData.toDateTime == _toDateTime, "To Date Time must remain the same");
-        adjustEmissionsData(existingEmissionsData, _targetToken, _co2eAmount, _emissionsOrigin, _protectedIPFSCID, _protectedIPFSCID, _sapcapDataHash, _emissionsVaultID);
+        adjustEmissionsData(existingEmissionsData, _targetToken, _co2eAmount, _emissionsOrigin, _protectedIPFSCID, _protectedIPFSCID, _sapcapDataHash, _emissionsVaultID, _ghgOrgID, _scopeLevel);
     }
     return true;
  }
- function adjustEmissionsData(emissionsData calldata _existingEmissions, uint32 _targetToken, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string calldata _emissionsVaultID, string calldata _ghgOrgID, uint _scopeLevel) private returns (bool) {
-        emissionsData storage adjustedEmissionsData = new emissionsData();
+ function adjustEmissionsData(emissionsData storage _existingEmissions, uint32 _targetToken, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string calldata _emissionsVaultID, string calldata _ghgOrgID, carbonScopeLevel _scopeLevel) private returns (bool) {
+        emissionsData memory adjustedEmissionsData;
         adjustedEmissionsData.tokenID = _targetToken;
         adjustedEmissionsData.fromDateTime = _existingEmissions.fromDateTime;
         adjustedEmissionsData.toDateTime = _existingEmissions.toDateTime;
@@ -163,36 +166,38 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
         adjustedEmissionsData.protectedIPFSCID = _protectedIPFSCID;
         adjustedEmissionsData.sapcapDataHash = _sapcapDataHash;
         adjustedEmissionsData.emissionsVaultID = _emissionsVaultID;
-        adjustedEmissionsData.ghgOrganizationID = _ghgOrgID;
-        adjustedEmissionsData.adjustmentID = latestePedByTokenID[_targetToken].length;
+        adjustedEmissionsData.reportingGHGOrgID = _ghgOrgID;
+        adjustedEmissionsData.scopeLevel = _scopeLevel;
+        adjustedEmissionsData.adjustmentID = allPedsByTokenID[_targetToken].length;
         publicEmissionsDisclosure.push(adjustedEmissionsData);
-        
+        return true;
  }
 
  //Carbon Emissions Data Verification
- function addEmissionsVerification(uint32 _targetToken, uint16 _tokenVerificationID, address _verifierDID, string memory _message, bytes calldata _verifierSignature, uint256 _verifiedOn, uint16 _currentAdjustmentID) public onlyEmissionsVerifier {
+ function addEmissionsVerification(uint32 _targetToken, uint256 _tokenVerificationID, address _verifierDID, string memory _message, bytes calldata _verifierSignature, uint256 _verifiedOn, uint16 _currentAdjustmentID) public onlyEmissionsVerifier {
    bool isValidVerification = false;
    isValidVerification = verifier.verify(_verifierDID, _message, _verifierSignature);
    require(isValidVerification == true, "Emission Data Verification is invalid");
 
-   emissionsVerification storage newPEV = new emissionsVerification();
+   emissionsVerification memory newPEV;
    newPEV.tokenID = _targetToken;
-   uint16 tokenVerificationID = pevsByTokenID[_targetToken].length;
    newPEV.verifierDID = _verifierDID;
    newPEV.verifierSignature = _verifierSignature;
-   newPEV.verifiedOnDateTime = block.timestamp; 
+   newPEV.verifiedOnDateTime1 = _verifiedOn;
+   newPEV.verifiedOnDateTime2 = block.timestamp; 
    newPEV.currentAdjustmentID = _currentAdjustmentID;
    publicEmissionsVerifications.push(newPEV);
    pevsByTokenID[_targetToken].push(newPEV);
    latestPevByTokenID[_targetToken] = newPEV;
-   emit emissionsTokenVerified(address(this), _targetToken, _currentAdjustmentID, tokenVerificationID, _verifierDID);
+   emit emissionsTokenVerified(address(this), _targetToken, _currentAdjustmentID, _tokenVerificationID, _verifierDID);
  }
 
  function requestVerifierRole(address _requestedVerifierDID, string calldata _ghgOrgID) public{
-    emissionsVerifier storage requestedVerifier = new emissionsVerifier();
-    requestedVerifier.verifierDID = _requestedVerifierDID;
+    emissionsVerifier memory requestedVerifier;
+    requestedVerifier.emissionsVerifierAddress = _requestedVerifierDID;
     requestedVerifier.requestedBy = msg.sender;
     requestedVerifier.acknowledgedVerifer = false;
+    requestedVerifier.subjectGHGOrgID = _ghgOrgID;
     emissionsVerifiersByAddress[_requestedVerifierDID] = requestedVerifier;
  }
 
@@ -201,14 +206,15 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
    emissionsVerifier storage approvedVerifier = emissionsVerifiersByAddress[_verifierDID];
    approvedVerifier.acknowledgedVerifer = true;
    approvedVerifier.acknowledgedOn = block.timestamp;
-   approvedVerifier.acknowledgedBy = msg.sender;
+   approvedVerifier.addedBy = msg.sender;
+   approvedVerifier.subjectGHGOrgID = _ghgOrgID;
    emissionsVerifiersByAddress[_verifierDID] = approvedVerifier;
  }
 
  //Role-based modifiers
  modifier onlyEmissionsVerifier() {
    emissionsVerifier memory emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];
-   require(emissionsVerifierLookup.acknowledDataSteward == true, "Emissions Verifier Role needs approval");
+   require(emissionsVerifierLookup.acknowledgedVerifer == true, "Emissions Verifier Role needs approval");
    _;
  }
 
@@ -229,7 +235,7 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint16 a
    bool isAuthority = false;
    emissionsVerifier memory emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];
    dataSteward memory dataStewardLookup = dataStewardsByAddress[msg.sender];
-   if(emissionsVerifierLookup.acknowledDataSteward == true || dataStewardLookup.acknowledDataSteward == true){
+   if(emissionsVerifierLookup.acknowledgedVerifer == true || dataStewardLookup.acknowledDataSteward == true){
       isAuthority = true;
    }
    require(isAuthority == true, "Data steward or emissions verifier role needs approval");
