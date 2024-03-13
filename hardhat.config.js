@@ -1,6 +1,6 @@
-import "@nomicfoundation/hardhat-toolbox";
-import "@vechain/hardhat-vechain";
-import '@vechain/hardhat-ethers';
+require("@nomicfoundation/hardhat-toolbox");
+require("@vechain/hardhat-vechain");
+require('@vechain/hardhat-ethers');
 
 const config = {
   solidity: "0.8.19",
@@ -26,4 +26,4 @@ const config = {
   },
 };
 
-export default config;
+module.exports = config;

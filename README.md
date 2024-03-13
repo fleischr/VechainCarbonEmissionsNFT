@@ -5,8 +5,11 @@
 Enterprises today are adopting carbon accounting as a standard business practice. The GHG Protocol defines a set of standards by which carbon emissions (and greenhouse gas emissions) are reported into sustainability reporting.
 
 GHG Protocol reporting has additional complexity to typical corporate financial accounting because of:
+
 1.) Scope 3 carbon emissions - which are carbon emissions that occur in the value chain, but are outside of a company's typical organizational boundary. Example: CO2 emissions from a supplier's trucking delivering goods to your company's warehouse. This presents issues with how to share and validate data across multiple companies.
+
 2.) MRV (measure report validate). Emissions data has to be measured, reported, and validated in a neutral, unobstructed way. Emissions data calculation can include several factors such as material master data in an ERP, current manufacturing processes, weather, and more.
+
 3.) 3rd party verifiability. Additionally - the emissions data and other MRV data can be subject to additional 3rd party auditors such as
 
 Additionally - enterprises face increasing public and private sector pressures to demonstrate increasing commitment to reduce emissions overall while also providing greater granularity and verifiability to any "net zero" and other sustainability claimes they make. It's making a greater impact on business - with many investors or businesses choosing to invest or do business with one enterprise or another with sustainability and ESG rankings being a differentiating factor.
