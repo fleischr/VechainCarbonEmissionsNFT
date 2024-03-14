@@ -3,7 +3,16 @@ require("@vechain/hardhat-vechain");
 require('@vechain/hardhat-ethers');
 
 const config = {
-  solidity: "0.8.19",
+  solidity: { 
+    version : "0.8.19", 
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+      viaIR: true,
+    },
+  },
   networks: {
     vechain_testnet: {
       url: "https://node-testnet.vechain.energy",

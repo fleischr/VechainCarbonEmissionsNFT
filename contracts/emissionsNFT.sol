@@ -154,15 +154,23 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 
         emissionsData storage existingEmissionsData = latestPedByTokenID[targetToken];
         require(existingEmissionsData.fromDateTime == _fromDateTime, "From Date Time must remain the same");
         require(existingEmissionsData.toDateTime == _toDateTime, "To Date Time must remain the same");
-        adjustEmissionsData(existingEmissionsData, targetToken, _co2eAmount, _emissionsOrigin, _protectedIPFSCID, _protectedIPFSCID, _sapcapDataHash, _emissionsVaultID, _ghgOrgID, _scopeLevel);
+        int256 adjustedCO2Eamount = _co2eAmount;
+        address adjustedEmissionsOrigin = _emissionsOrigin;
+        bytes32 adjustedPublicIPFSCID = _publicIPFSCID;
+        bytes32 adjustedProtectedIPFSCID = _protectedIPFSCID;
+        bytes32 adjustedSAPCAPdatahash = _sapcapDataHash;
+        string calldata adjustedEmissionsVaultID = _emissionsVaultID;
+        string calldata adjustedGHGOrg = _ghgOrgID;
+        carbonScopeLevel adjustedScopeLevel = _scopeLevel;
+        adjustEmissionsData(existingEmissionsData.fromDateTime, existingEmissionsData.toDateTime, targetToken, adjustedCO2Eamount, adjustedEmissionsOrigin, adjustedPublicIPFSCID, adjustedProtectedIPFSCID, adjustedSAPCAPdatahash, adjustedEmissionsVaultID, adjustedGHGOrg, adjustedScopeLevel);
     }
     return true;
  }
- function adjustEmissionsData(emissionsData storage _existingEmissions, uint32 _targetToken, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string calldata _emissionsVaultID, string calldata _ghgOrgID, carbonScopeLevel _scopeLevel) private returns (bool) {
+ function adjustEmissionsData(uint256 _fromDateTime, uint256 _toDateTime, uint32 _targetToken, int256 _co2eAmount, address _emissionsOrigin, bytes32 _publicIPFSCID, bytes32 _protectedIPFSCID, bytes32 _sapcapDataHash, string calldata _emissionsVaultID, string calldata _ghgOrgID, carbonScopeLevel _scopeLevel) private returns (bool) {
         emissionsData memory adjustedEmissionsData;
         adjustedEmissionsData.tokenID = _targetToken;
-        adjustedEmissionsData.fromDateTime = _existingEmissions.fromDateTime;
-        adjustedEmissionsData.toDateTime = _existingEmissions.toDateTime;
+        adjustedEmissionsData.fromDateTime = _fromDateTime;
+        adjustedEmissionsData.toDateTime = _toDateTime;
         adjustedEmissionsData.co2eAmount = _co2eAmount;
         adjustedEmissionsData.emissionsOrigin = _emissionsOrigin;
         adjustedEmissionsData.publicIPFSCID = _publicIPFSCID;
