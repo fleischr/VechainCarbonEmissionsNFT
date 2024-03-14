@@ -56,6 +56,12 @@ npx hardhat node
 npx hardhat run scripts/deploy.js
 ```
 
+To compile the contract
+
+```shell
+npx hardhat compile
+```
+
 
 ### Available Deployments
 VeChain Testnet : TBD

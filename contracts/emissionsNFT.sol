@@ -131,10 +131,13 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 
     //ensure valid scope level is passed
     require(_scopeLevel <= carbonScopeLevel.Scope3, "Emissions data must be classified as scopes 1-3 or as unknown(0)");
     
+    uint32 targetToken = _targetToken;
+    emissionsData[] memory pedsByTokenID;
+    pedsByTokenID = allPedsByTokenID[targetToken];
     //see if this emissions data was already maintained
-    if(allPedsByTokenID[_targetToken].length == 0) {
+    if(pedsByTokenID.length == 0) {
         emissionsData memory newEmissionsData;
-        newEmissionsData.tokenID = _targetToken;
+        newEmissionsData.tokenID = targetToken;
         newEmissionsData.fromDateTime = _fromDateTime;
         newEmissionsData.toDateTime = _toDateTime;
         newEmissionsData.co2eAmount = _co2eAmount;
@@ -146,12 +149,12 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 
         newEmissionsData.reportingGHGOrgID = _ghgOrgID;
         newEmissionsData.adjustmentID = 0;
         publicEmissionsDisclosure.push(newEmissionsData);
-        latestPedByTokenID[_targetToken] = newEmissionsData;
+        latestPedByTokenID[targetToken] = newEmissionsData;
     } else {
-        emissionsData storage existingEmissionsData = latestPedByTokenID[_targetToken];
+        emissionsData storage existingEmissionsData = latestPedByTokenID[targetToken];
         require(existingEmissionsData.fromDateTime == _fromDateTime, "From Date Time must remain the same");
         require(existingEmissionsData.toDateTime == _toDateTime, "To Date Time must remain the same");
-        adjustEmissionsData(existingEmissionsData, _targetToken, _co2eAmount, _emissionsOrigin, _protectedIPFSCID, _protectedIPFSCID, _sapcapDataHash, _emissionsVaultID, _ghgOrgID, _scopeLevel);
+        adjustEmissionsData(existingEmissionsData, targetToken, _co2eAmount, _emissionsOrigin, _protectedIPFSCID, _protectedIPFSCID, _sapcapDataHash, _emissionsVaultID, _ghgOrgID, _scopeLevel);
     }
     return true;
  }
