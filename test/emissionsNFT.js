@@ -38,17 +38,27 @@ const {
     });
 
     describe("GHGOrgs", function(){
+        it("should require the data steward role for creating reporting ghg orgs", async function(){
+
+        });
+
+        it("should set mint readiness to true upon initial GHG org definition", async function() {
+
+        });
 
     });
 
     describe("EmissionsVerifiers", function(){
+        it("should allow a data steward to approve the emissions verifier", async function(){
+            
+        });
 
     });
 
     describe("EmissionsData",function(){
 
         it("should only allow this activity for data stewards", async function(){
-            
+
         });
 
         it("should mint with appropriate from to dates", async function(){
@@ -63,11 +73,19 @@ const {
 
         });
 
-        it("should automatically add an adjustment record")
+        it("should automatically add an adjustment record based on token id", async function(){
+
+        });
 
     });
 
     describe("EmissionsDataVerification",function(){
+        it("should only permit acknowledged verifiers", async function(){
+
+        });
+        it("should reject invalid signatures", async function(){
+            
+        });
 
     });
     

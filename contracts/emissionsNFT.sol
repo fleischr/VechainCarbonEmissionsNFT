@@ -2,8 +2,9 @@
 pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./verifierContract.sol";
+import "./iEmissionsNFT.sol";
 
-contract emissionsNFT is ERC721 {
+contract emissionsNFT is ERC721, iEmissionsNFT {
  address public owner;
  uint32 latestTokenID;
  bool readyToMint;
@@ -19,79 +20,23 @@ contract emissionsNFT is ERC721 {
    readyToMint = false;
  }
 
-enum carbonScopeLevel {
-  Unknown,
-  Scope1,
-  Scope2,
-  Scope3
-}
-
- //GHG Organization
- struct ghgOrganization {
-    string ghgOrganizationID;
-    string ghgOrganizationName;
-    bytes privateHash;
- }
  mapping(string => ghgOrganization) private registeredGHGOrg;
  mapping(string => bool) private isGHGOrg;
 
- //Tokenized Carbon Emissions Data
- struct emissionsData {
-    uint32 tokenID;
-    uint256 fromDateTime;
-    uint256 toDateTime;
-    int256 co2eAmount;
-    address emissionsOrigin;
-    bytes32 publicIPFSCID;
-    bytes32 protectedIPFSCID;
-    bytes32 sapcapDataHash;
-    string emissionsVaultID;
-    uint256 adjustmentID;
-    string reportingGHGOrgID;
-    carbonScopeLevel scopeLevel;
- }
  emissionsData[] public publicEmissionsDisclosure;
  mapping(uint32 => emissionsData[]) public allPedsByTokenID;
  mapping(uint32 => emissionsData) public latestPedByTokenID;
  mapping(uint32 => emissionsData) public latestVerifiedPedByTokenID;
  
- //Carbon Emissions Verification
- struct emissionsVerification {
-    uint32 tokenID;
-    uint16 tokenVerificationID;
-    address verifierDID;
-    bytes verifierSignature;
-    uint256 verifiedOnDateTime1;
-    uint256 verifiedOnDateTime2;
-    uint16 verificationCount;
-    uint16 currentAdjustmentID;
- }
  emissionsVerification[] public publicEmissionsVerifications;
  mapping(uint32 => emissionsVerification[]) public pevsByTokenID;
  mapping(uint32 => emissionsVerification) public latestPevByTokenID;
 
 event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 adjustmentID, uint256 tokenVerificationID, address verifierDID);
  
- //Carbon Emissions Verifiers
- struct emissionsVerifier {
-   address emissionsVerifierAddress;
-   bool acknowledgedVerifer;
-   address requestedBy;
-   address addedBy;
-   string subjectGHGOrgID;
-   string verificationOrgID;
-   uint256 acknowledgedOn;
- }
  emissionsVerifier[] public emissionsVerifiers;
  mapping(address => emissionsVerifier) public emissionsVerifiersByAddress;
 
- //Carbon Emissions Data Stewards
- struct dataSteward {
-   address dataStewardAddress;
-   bool acknowledDataSteward;
-   address addedBy;
-   string ghgOrgID;
- }
  dataSteward[] public dataStewards;
  mapping(address => dataSteward) public dataStewardsByAddress;
 
