@@ -62,4 +62,26 @@ interface iEmissionsNFT {
         address addedBy;
         string ghgOrgID;
     }
+
+    //Scope 3 verification request
+    struct scope3VerificationRequest {
+        uint32 internalID;
+        uint256 scope3VReqID;
+        address scope3Contract;
+        address scope1Contract;
+        string scope3GHGOrgID;
+        uint32 scope3TokenID;
+        string scope1GHGOrgID;
+        uint32 scope1TokenID;
+    }
+
+    function getNextTokenID() external view returns (uint32);
+
+    function getAllEmissionsData() external view returns (emissionsData[] memory);
+
+    function getEmissionsDataByTokenID(uint32) external view returns(emissionsData[] memory);
+
+    function requestScope3EmissionsDataVerification(address _destinationContract, string memory _myghgOrgID, string memory _yourghgOrgID, uint32 _myTokenID, uint32 _yourTokenID) external returns(uint256);
+
+
 }
