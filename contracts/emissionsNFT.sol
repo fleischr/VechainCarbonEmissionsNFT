@@ -167,6 +167,16 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 
    emissionsVerifiersByAddress[_verifierDID] = approvedVerifier;
  }
 
+ function getNextTokenID() external view returns (uint32){}
+
+ function getAllEmissionsData() external view returns (emissionsData[] memory){}
+
+ function getEmissionsDataByTokenID(uint32) external view returns(emissionsData[] memory){}
+
+ function requestScope3EmissionsDataVerification(address _destinationContract, string memory _myghgOrgID, string memory _yourghgOrgID, uint32 _myTokenID, uint32 _yourTokenID) external returns(uint256){}
+
+ function logScope3VerificationRequests(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory){}
+
  //Role-based modifiers
  modifier onlyEmissionsVerifier() {
    emissionsVerifier memory emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];
