@@ -40,6 +40,9 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 
  dataSteward[] public dataStewards;
  mapping(address => dataSteward) public dataStewardsByAddress;
 
+ //scope3 requests
+ scope3VerificationRequest[] public scope3vreqs;
+
  function determineMintReadiness() public view returns (bool) {
     return readyToMint;
  }
@@ -173,9 +176,28 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 
 
  function getEmissionsDataByTokenID(uint32) external view returns(emissionsData[] memory){}
 
- function requestScope3EmissionsDataVerification(address _destinationContract, string memory _myghgOrgID, string memory _yourghgOrgID, uint32 _myTokenID, uint32 _yourTokenID) external returns(uint256){}
+ function requestScope3EmissionsDataVerification(address _destinationContract, string memory _myghgOrgID, string memory _yourghgOrgID, uint32 _myTokenID, uint32 _yourTokenID) external returns(uint256){
+    // get the remote contract instance
+    iEmissionsNFT remoteContract = iEmissionsNFT(_destinationContract);
+    try remoteContract.logScope3VerificationRequests(address(this), _myghgOrgID, _yourghgOrgID, _myTokenID, _yourTokenID) {
+      //todo add event
+    } catch {
+      //to do add event
+    }
+ }
 
- function logScope3VerificationRequests(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory){}
+ function logScope3VerificationRequests(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory){
+    scope3VerificationRequest memory inboundRequest;
+    inboundRequest.scope1Contract = address(this);
+    inboundRequest.scope3Contract = _originContract;
+    inboundRequest.scope3GHGOrgID = _scope3GHGOrgID;
+    inboundRequest.scope1GHGOrgID = _scope1GHGOrgID;
+    inboundRequest.scope1TokenID = _scope1TokenID;
+    inboundRequest.scope3TokenID = _scope3TokenID;
+    inboundRequest.scope3vreqStatus = scope3vreqStatusEnum.CREATED;
+    scope3vreqs.push(inboundRequest);
+    return inboundRequest;
+ }
 
  //Role-based modifiers
  modifier onlyEmissionsVerifier() {
