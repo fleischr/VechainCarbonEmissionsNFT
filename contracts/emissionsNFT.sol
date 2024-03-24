@@ -199,6 +199,13 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 
     return inboundRequest;
  }
 
+ function sendScope3Verification(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory) {
+    iEmissionsNFT remoteContract = iEmissionsNFT(_originContract);
+    scope3VerificationRequest memory returnedRequest;
+    //remoteContract.createScope3Verification(_targetToken, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID);
+    return returnedRequest;
+ }
+
  //Role-based modifiers
  modifier onlyEmissionsVerifier() {
    emissionsVerifier memory emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];

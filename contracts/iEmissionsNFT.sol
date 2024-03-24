@@ -91,6 +91,10 @@ interface iEmissionsNFT {
     function requestScope3EmissionsDataVerification(address _destinationContract, string memory _myghgOrgID, string memory _yourghgOrgID, uint32 _myTokenID, uint32 _yourTokenID) external returns(uint256);
 
     function logScope3VerificationRequests(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory);
+
+    function sendScope3Verification(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory);
+
+    function createScope3Verification(uint32 _targetToken, uint256 _tokenVerificationID, address _verifierDID, string memory _message, bytes calldata _verifierSignature, uint256 _verifiedOn, uint16 _currentAdjustmentID) external returns (emissionsVerification memory);
     
 
 
