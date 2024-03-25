@@ -82,6 +82,20 @@ interface iEmissionsNFT {
         scope3vreqStatusEnum scope3vreqStatus;
     }
 
+    //events
+    event ghgOrgCreated(string ghgOrgId);
+    event dataStewardAdded(address dataStewardAddress);
+    event emissionsVerifierAdded(address verifierDID, string ghgOrgID, string verifyingOrgID);
+    event emissionsTokenCreated(address smartContractAddr, uint32 tokenID);
+    event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 adjustmentID, uint256 tokenVerificationID, address verifierDID);
+    event reenlistVerifiersForScope3(address scope1ContractAddr, address scope3ContractAddr, string scope1ghgOrgID, string scope3ghgOrgID, uint32 scope1TokenID, uint32 scope3TokenID);
+    
+
+
+
+
+    //functions
+
     function getNextTokenID() external view returns (uint32);
 
     function getAllEmissionsData() external view returns (emissionsData[] memory);
@@ -92,7 +106,7 @@ interface iEmissionsNFT {
 
     function logScope3VerificationRequests(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory);
 
-    function sendScope3Verification(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory);
+    function sendScope3Verification(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID, uint256 _tokenVerificationID) external returns (scope3VerificationRequest memory);
 
     function createScope3Verification(uint32 _targetToken, uint256 _tokenVerificationID, address _verifierDID, string memory _message, bytes calldata _verifierSignature, uint256 _verifiedOn, uint16 _currentAdjustmentID) external returns (emissionsVerification memory);
     

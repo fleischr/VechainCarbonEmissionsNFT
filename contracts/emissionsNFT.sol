@@ -31,8 +31,6 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
  emissionsVerification[] public publicEmissionsVerifications;
  mapping(uint32 => emissionsVerification[]) public pevsByTokenID;
  mapping(uint32 => emissionsVerification) public latestPevByTokenID;
-
-event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 adjustmentID, uint256 tokenVerificationID, address verifierDID);
  
  emissionsVerifier[] public emissionsVerifiers;
  mapping(address => emissionsVerifier) public emissionsVerifiersByAddress;
@@ -199,11 +197,15 @@ event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 
     return inboundRequest;
  }
 
- function sendScope3Verification(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory) {
+ function sendScope3Verification(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID, uint256 _tokenVerificationID) external returns (scope3VerificationRequest memory) {
     iEmissionsNFT remoteContract = iEmissionsNFT(_originContract);
     scope3VerificationRequest memory returnedRequest;
     //remoteContract.createScope3Verification(_targetToken, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID);
     return returnedRequest;
+ }
+
+ function createScope3Verification(uint32 _targetToken, uint256 _tokenVerificationID, address _verifierDID, string memory _message, bytes calldata _verifierSignature, uint256 _verifiedOn, uint16 _currentAdjustmentID) external returns (emissionsVerification memory) {
+    addEmissionsVerification(_targetToken, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID); 
  }
 
  //Role-based modifiers
