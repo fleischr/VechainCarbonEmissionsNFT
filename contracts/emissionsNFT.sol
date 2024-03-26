@@ -208,6 +208,10 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
     addEmissionsVerification(_targetToken, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID); 
  }
 
+ function pushScope3Verifiers(address _scope3contract, string calldata _scope1GHGOrgID, string calldata _scope3GHGOrgID) external returns (emissionsVerifier memory) {
+  
+ }
+
  //Role-based modifiers
  modifier onlyEmissionsVerifier() {
    emissionsVerifier memory emissionsVerifierLookup = emissionsVerifiersByAddress[msg.sender];
