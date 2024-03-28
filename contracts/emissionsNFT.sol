@@ -149,6 +149,12 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
    emit emissionsTokenVerified(address(this), _targetToken, _currentAdjustmentID, _tokenVerificationID, _verifierDID);
  }
 
+ function getTokenVerifications(uint32 _tokenID) external view returns(emissionsVerification[] memory){
+  emissionsVerification[] memory emissionsVerificationByToken;
+  emissionsVerificationByToken = pevsByTokenID[_tokenID];
+  return emissionsVerificationByToken;
+ }
+
  function requestVerifierRole(address _requestedVerifierDID, string calldata _ghgOrgID) public{
     emissionsVerifier memory requestedVerifier;
     requestedVerifier.emissionsVerifierAddress = _requestedVerifierDID;
@@ -172,7 +178,7 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
 
  function getAllEmissionsData() external view returns (emissionsData[] memory){}
 
- function getEmissionsDataByTokenID(uint32) external view returns(emissionsData[] memory){}
+ function getEmissionsDataByTokenID(uint32 _tokenID) external view returns(emissionsData[] memory){}
 
  function requestScope3EmissionsDataVerification(address _destinationContract, string memory _myghgOrgID, string memory _yourghgOrgID, uint32 _myTokenID, uint32 _yourTokenID) external returns(uint256){
     // get the remote contract instance
@@ -197,9 +203,16 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
     return inboundRequest;
  }
 
+ function getScope3VerificationRequest(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory){
+   scope3VerificationRequest memory myScope3Request;
+   return myScope3Request;
+ }
+
  function sendScope3Verification(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID, uint256 _tokenVerificationID) external returns (scope3VerificationRequest memory) {
     iEmissionsNFT remoteContract = iEmissionsNFT(_originContract);
+    //remoteContract.createScope3Verification(_scope3TokenID, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID);
     scope3VerificationRequest memory returnedRequest;
+    //returnedRequest = iEmissionsNFT.getScope3VerificationRequest(address(this), _scope3GHGOrgID, _scope1GHGOrgID, _scope3TokenID, _scope1TokenID);
     //remoteContract.createScope3Verification(_targetToken, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID);
     return returnedRequest;
  }
@@ -209,7 +222,7 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
  }
 
  function pushScope3Verifiers(address _scope3contract, string calldata _scope1GHGOrgID, string calldata _scope3GHGOrgID) external returns (emissionsVerifier memory) {
-  
+    //get the verifiers for the scope 1 token
  }
 
  //Role-based modifiers

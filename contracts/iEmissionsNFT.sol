@@ -89,6 +89,7 @@ interface iEmissionsNFT {
     event emissionsTokenCreated(address smartContractAddr, uint32 tokenID);
     event emissionsTokenVerified(address smartContractAddr, uint32 tokenID, uint256 adjustmentID, uint256 tokenVerificationID, address verifierDID);
     event reenlistVerifiersForScope3(address scope1ContractAddr, address scope3ContractAddr, string scope1ghgOrgID, string scope3ghgOrgID, uint32 scope1TokenID, uint32 scope3TokenID);
+    event scope3referenced(address scope1contract, address scope3contract, string scope1GHGOrgID, string scope3GHGOrgID, uint32 scope1TokenID, uint32 scope3TokenID, uint256 scope1TokenVerificationID);
 
 
 
@@ -100,11 +101,15 @@ interface iEmissionsNFT {
 
     function getAllEmissionsData() external view returns (emissionsData[] memory);
 
-    function getEmissionsDataByTokenID(uint32) external view returns(emissionsData[] memory);
+    function getEmissionsDataByTokenID(uint32 _tokenID) external view returns(emissionsData[] memory);
+
+    function getTokenVerifications(uint32 _tokenID) external view returns(emissionsVerification[] memory);
 
     function requestScope3EmissionsDataVerification(address _destinationContract, string memory _myghgOrgID, string memory _yourghgOrgID, uint32 _myTokenID, uint32 _yourTokenID) external returns(uint256);
 
     function logScope3VerificationRequests(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory);
+
+    function getScope3VerificationRequest(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID) external returns (scope3VerificationRequest memory);
 
     function sendScope3Verification(address _originContract, string calldata _scope3GHGOrgID, string calldata _scope1GHGOrgID, uint32 _scope3TokenID, uint32 _scope1TokenID, uint256 _tokenVerificationID) external returns (scope3VerificationRequest memory);
 
