@@ -62,6 +62,12 @@ To compile the contract
 npx hardhat compile
 ```
 
+Deployment
+
+```shell
+npx hardhat deploy
+```
+
 
 ### Available Deployments
 VeChain Testnet : TBD
