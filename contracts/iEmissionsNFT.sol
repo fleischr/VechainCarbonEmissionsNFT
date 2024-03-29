@@ -97,6 +97,8 @@ interface iEmissionsNFT {
 
     //functions
 
+    function autoApproveDataSteward(address _newDataSteward, string calldata _ghgOrgID) external returns (bool);
+
     function getNextTokenID() external view returns (uint32);
 
     function getAllEmissionsData() external view returns (emissionsData[] memory);

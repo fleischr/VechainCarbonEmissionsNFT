@@ -174,6 +174,19 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
    emissionsVerifiersByAddress[_verifierDID] = approvedVerifier;
  }
 
+ function autoApproveDataSteward(address _newDataSteward, string calldata _ghgOrgID) external returns (bool) {
+    require(msg.sender == owner, "Only the contract owner may do this");
+    dataSteward memory autoApproved;
+    autoApproved.dataStewardAddress = _newDataSteward;
+    autoApproved.addedBy = msg.sender;
+    autoApproved.acknowledDataSteward = true;
+    autoApproved.ghgOrgID = _ghgOrgID;
+    dataStewards.push(autoApproved);
+    dataStewardsByAddress[_newDataSteward] = autoApproved;
+    return true;
+ }
+
+
  function getNextTokenID() external view returns (uint32){}
 
  function getAllEmissionsData() external view returns (emissionsData[] memory){}
