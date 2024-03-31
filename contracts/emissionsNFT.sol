@@ -6,11 +6,13 @@ import "./iEmissionsNFT.sol";
 
 contract emissionsNFT is ERC721, iEmissionsNFT {
  address public owner;
+ address public anchorContract;
  uint32 latestTokenID;
  bool readyToMint;
  VerifySignature verifier;
- constructor() ERC721("EmissionsNFT", "CO2eNFT") {
+ constructor(address _anchorContract) ERC721("EmissionsNFT", "CO2eNFT") {
    owner = msg.sender;
+   anchorContract = _anchorContract;
    dataSteward memory defaultDataSteward;
    defaultDataSteward.dataStewardAddress = msg.sender;
    defaultDataSteward.acknowledDataSteward = true;
