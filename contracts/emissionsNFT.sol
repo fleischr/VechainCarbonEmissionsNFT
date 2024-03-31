@@ -53,8 +53,11 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
   latestTokenID++;
  }
 
- function mint(address _to, uint32 _tokenID) private {
-  _mint(_to, _tokenID);
+ function mint(address _to) private {
+  uint32 newTokenID = getNextTokenID();
+  _mint(_to, newTokenID);
+  emit emissionsTokenCreated(address(this), newTokenID);
+  latestTokenID++;
  }
 
  function defineGHGOrg(string calldata _ghgOrganizationID, string calldata _ghgOrganizationName) public onlyDataSteward {
@@ -189,11 +192,15 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
  }
 
 
- function getNextTokenID() external view returns (uint32){}
+ function getNextTokenID() public view returns (uint32){
+   return latestTokenID;
+ }
 
  function getAllEmissionsData() external view returns (emissionsData[] memory){}
 
- function getEmissionsDataByTokenID(uint32 _tokenID) external view returns(emissionsData[] memory){}
+ function getEmissionsDataByTokenID(uint32 _tokenID) external view returns(emissionsData[] memory){
+   return allPedsByTokenID[_tokenID];
+ }
 
  function requestScope3EmissionsDataVerification(address _destinationContract, string memory _myghgOrgID, string memory _yourghgOrgID, uint32 _myTokenID, uint32 _yourTokenID) external returns(uint256){
     // get the remote contract instance

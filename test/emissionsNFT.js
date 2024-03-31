@@ -14,7 +14,7 @@ const {
         const EmissionsNFTContract = await ethers.getContractFactory("emissionsNFT");
         const contract_deployment = await EmissionsNFTContract.deploy();
 
-        return { lock, unlockTime, lockedAmount, owner, otherAccount };
+        return { lock, owner, otherAccount };
 
     };
 
@@ -22,6 +22,10 @@ const {
         
         it("Should make the contract deployer an acknowledged data steward", async function (){
 
+        });
+
+        it("Should permit the contract deploy to auto approve data stewards", async function(){
+            
         });
 
         it("Should set mint readiness to false w/o any GHG org defined", async function() {

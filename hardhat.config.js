@@ -14,6 +14,12 @@ const config = {
     },
   },
   networks: {
+    localdev : {
+      url : "",
+      accounts: ["0x765573031fb5c056bff1b764a797a571478b6fcc97f34165b047da9b09c02e10"],
+      restful: true,
+      gas: 10000000  
+    },
     vechain_testnet: {
       url: "https://node-testnet.vechain.energy",
       accounts: ["0x765573031fb5c056bff1b764a797a571478b6fcc97f34165b047da9b09c02e10"],
