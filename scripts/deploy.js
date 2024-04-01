@@ -8,12 +8,12 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const emissionsNFT = await hre.ethers.deployContract("emissionsNFT", [], {});
+  const emissionsNFTFactory = await hre.ethers.deployContract("emissionsNFTFactory", [], {});
 
-  await emissionsNFT.waitForDeployment();
+  await emissionsNFTFactory.waitForDeployment();
 
   console.log(
-    `EmissionsNFT Contract deployed to ${emissionsNFT.target}`
+    `EmissionsNFT Factory Contract deployed to ${emissionsNFTFactory.target}`
   );
 }
 

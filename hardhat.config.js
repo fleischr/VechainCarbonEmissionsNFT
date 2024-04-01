@@ -15,7 +15,7 @@ const config = {
   },
   networks: {
     localdev : {
-      url : "",
+      url : "http://localhost:8669",
       accounts: ["0x765573031fb5c056bff1b764a797a571478b6fcc97f34165b047da9b09c02e10"],
       restful: true,
       gas: 10000000  
