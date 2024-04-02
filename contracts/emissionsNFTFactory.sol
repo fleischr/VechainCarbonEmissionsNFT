@@ -16,13 +16,14 @@ contract emissionsNFTFactory {
         //creationFee = _creationFee;
     }
 
-    function createNFT() public {
-        require(paymentToken.transferFrom(msg.sender, address(this), creationFee),
-            "Failed to transfer creation fee");
+    function createNFT() public returns(emissionsNFT) {
+       //require(paymentToken.transferFrom(msg.sender, address(this), creationFee),
+       //     "Failed to transfer creation fee");
 
         emissionsNFT newNFT = new emissionsNFT(address(this));
         deployedNFTs.push(newNFT);
         emissionsNFTByDeployer[msg.sender] = newNFT;
+        return newNFT;
     }
 
     function getDeployedNFTs() public view returns (emissionsNFT[] memory) {
