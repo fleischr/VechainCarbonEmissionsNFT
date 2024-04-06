@@ -4,13 +4,15 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
-const hre = require("hardhat");
+const hre = require("hardhat/types");
+const deployFunction = require("hardhat-deploy/types");
 
 async function main() {
+  const { deployer } = await hre.getNamedAccounts();
+  //const emissionsNFTFactory = await hre.ethers.deployContract("emissionsNFTFactory", [], {});
+  //await emissionsNFTFactory.waitForDeployment();
 
-  const emissionsNFTFactory = await hre.ethers.deployContract("emissionsNFTFactory", [], {});
-
-  await emissionsNFTFactory.waitForDeployment();
+  await hre.deployments.deploy('emissionsNFTFactory', { from: deployer});
 
   console.log(
     `EmissionsNFT Factory Contract deployed to ${emissionsNFTFactory.target}`

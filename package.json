@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@dotenvx/dotenvx": "^0.29.2",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
@@ -16,14 +17,19 @@
     "@vechain/hardhat-web3": "^0.1.8",
     "@vechain/web3-providers-connex": "^1.1.2",
     "chai": "^4.2.0",
+    "dotenv": "^16.4.5",
     "ethers": "^6.4.0",
     "hardhat": "^2.20.1",
+    "hardhat-deploy": "npm:@vechain.energy/hardhat-deploy@latest",
     "hardhat-gas-reporter": "^1.0.8",
     "solidity-coverage": "^0.8.0",
     "typechain": "^8.3.0"
   },
   "dependencies": {
+    "@ensdomains/ens-contracts": "^1.1.4",
     "@openzeppelin/contracts": "4",
+    "@openzeppelin/contracts-upgradeable": "4",
+    "@openzeppelin/hardhat-upgrades": "^3.0.5",
     "@vechain.energy/hardhat-deploy": "^0.11.46"
   }
 }

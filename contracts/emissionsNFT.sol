@@ -234,7 +234,8 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
     iEmissionsNFT remoteContract = iEmissionsNFT(_originContract);
     //remoteContract.createScope3Verification(_scope3TokenID, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID);
     scope3VerificationRequest memory returnedRequest;
-    //returnedRequest = iEmissionsNFT.getScope3VerificationRequest(address(this), _scope3GHGOrgID, _scope1GHGOrgID, _scope3TokenID, _scope1TokenID);
+    address myContractAddress = address(this);
+    returnedRequest = iEmissionsNFT.getScope3VerificationRequest(myContractAddress, _scope3GHGOrgID, _scope1GHGOrgID, _scope3TokenID, _scope1TokenID);
     //remoteContract.createScope3Verification(_targetToken, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID);
     return returnedRequest;
  }

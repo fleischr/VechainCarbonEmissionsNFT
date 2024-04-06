@@ -2,6 +2,28 @@ require("@nomicfoundation/hardhat-toolbox");
 require("@vechain/hardhat-vechain");
 require('@vechain/hardhat-ethers');
 
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
+if (!PRIVATE_KEY) {
+  throw new Error(
+    "Please set your PRIVATE_KEY in a .env file or in your environment variables"
+  );
+}
+
+const accounts = [
+  PRIVATE_KEY, // deployer
+  process.env.DEPLOYER_PRIVATE_KEY ?? PRIVATE_KEY, // proxyOwner
+  process.env.OWNER_PRIVATE_KEY ?? PRIVATE_KEY, // owner
+];
+
+// see https://github.com/wighawag/hardhat-deploy?tab=readme-ov-file#1-namedaccounts-ability-to-name-addresses
+const namedAccounts = {
+  deployer: { default: 0 },
+  proxyOwner: { default: 1 },
+  owner: { default: 2 },
+};
+
+
 const config = {
   solidity: { 
     version : "0.8.19", 
