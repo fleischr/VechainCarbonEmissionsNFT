@@ -235,7 +235,7 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
     //remoteContract.createScope3Verification(_scope3TokenID, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID);
     scope3VerificationRequest memory returnedRequest;
     address myContractAddress = address(this);
-    returnedRequest = iEmissionsNFT.getScope3VerificationRequest(myContractAddress, _scope3GHGOrgID, _scope1GHGOrgID, _scope3TokenID, _scope1TokenID);
+    //returnedRequest = iEmissionsNFT.getScope3VerificationRequest(myContractAddress, _scope3GHGOrgID, _scope1GHGOrgID, _scope3TokenID, _scope1TokenID);
     //remoteContract.createScope3Verification(_targetToken, _tokenVerificationID, _verifierDID, _message, _verifierSignature, _verifiedOn, _currentAdjustmentID);
     return returnedRequest;
  }
@@ -246,6 +246,10 @@ contract emissionsNFT is ERC721, iEmissionsNFT {
 
  function pushScope3Verifiers(address _scope3contract, string calldata _scope1GHGOrgID, string calldata _scope3GHGOrgID) external returns (emissionsVerifier memory) {
     //get the verifiers for the scope 1 token
+ }
+
+ function shareAddress() external view returns(address) {
+    return address(this);
  }
 
  //Role-based modifiers

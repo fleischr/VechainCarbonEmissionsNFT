@@ -119,6 +119,7 @@ interface iEmissionsNFT {
 
     function pushScope3Verifiers(address _scope3contract, string calldata _scope1GHGOrgID, string calldata _scope3GHGOrgID) external returns (emissionsVerifier memory);
     
+    function shareAddress() external view returns(address);
 
 
 }
