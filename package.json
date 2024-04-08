@@ -31,5 +31,13 @@
     "@openzeppelin/contracts-upgradeable": "4",
     "@openzeppelin/hardhat-upgrades": "^3.0.5",
     "@vechain.energy/hardhat-deploy": "^0.11.46"
+  },
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "test:watch": "nodemon -e sol,ts --watch contracts --watch test --exec 'hardhat compile; hardhat typechain; hardhat test'",
+    "coverage": "hardhat coverage",
+    "typechain": "hardhat typechain",
+    "deploy": "npx dotenvx run -- hardhat deploy"
   }
 }

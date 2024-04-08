@@ -35,6 +35,7 @@ const config = {
       viaIR: true,
     },
   },
+  defaultNetwork: "vechain_testnet",
   networks: {
     localdev : {
       url : "http://localhost:8669",
@@ -61,6 +62,7 @@ const config = {
       gas: 10000000,
     },
   },
+  namedAccounts
 };
 
 module.exports = config;
