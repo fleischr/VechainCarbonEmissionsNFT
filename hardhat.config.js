@@ -1,17 +1,41 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("@openzeppelin/hardhat-upgrades");
 require("@vechain/hardhat-vechain");
 require('@vechain/hardhat-ethers');
+require('dotenv/config');
+require('hardhat-deploy');
+
+const ethUtil = require('ethereumjs-util');
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
-if (!PRIVATE_KEY) {
+//check deployer public address
+if (!process.env.PRIVATE_KEY) {
   throw new Error(
     "Please set your PRIVATE_KEY in a .env file or in your environment variables"
   );
+} else {
+  // Replace the following private key with your actual private key.
+  const hexKey = process.env.PRIVATE_KEY.replace("0x","")
+  const privateKey = Buffer.from(hexKey, 'hex');
+
+  // Derive the public key
+  const publicKey = ethUtil.privateToPublic(privateKey);
+  // Derive the Ethereum address from the public key
+  const my_address = ethUtil.publicToAddress(publicKey, true); // The 'true' parameter here ensures the address is returned as a Buffer.
+
+  // Convert the address to a hexadecimal string
+  const my_addressHex = ethUtil.bufferToHex(my_address);
+
+  // Convert public key to hex string
+  const publicKeyString = publicKey.toString('hex');
+  const ethereumAddressString = ethUtil.bufferToHex(my_addressHex);
+  console.log("Deployer Public Key:", publicKeyString);
+  console.log("Deployer address: ", ethereumAddressString );
 }
 
 const accounts = [
-  PRIVATE_KEY, // deployer
+  process.env.PRIVATE_KEY ?? PRIVATE_KEY, // deployer
   process.env.DEPLOYER_PRIVATE_KEY ?? PRIVATE_KEY, // proxyOwner
   process.env.OWNER_PRIVATE_KEY ?? PRIVATE_KEY, // owner
 ];
@@ -39,13 +63,14 @@ const config = {
   networks: {
     localdev : {
       url : "http://localhost:8669",
-      accounts: ["0x765573031fb5c056bff1b764a797a571478b6fcc97f34165b047da9b09c02e10"],
+      accounts,
       restful: true,
-      gas: 10000000  
+      gas: 10000000 ,
+      loggingEnabled : true
     },
     vechain_testnet: {
       url: "https://node-testnet.vechain.energy",
-      accounts: ["0x765573031fb5c056bff1b764a797a571478b6fcc97f34165b047da9b09c02e10"],
+      accounts,
       restful: true,
       gas: 10000000,
       
@@ -53,11 +78,12 @@ const config = {
       // visit vechain.energy for a public fee delegation service
       delegate: {
         url: "https://sponsor-testnet.vechain.energy/by/90"
-      }
+      },
+      loggingEnabled: true
     },
     vechain_mainnet: {
       url: "https://node-mainnet.vechain.energy",
-      accounts: ["0x765573031fb5c056bff1b764a797a571478b6fcc97f34165b047da9b09c02e10"],
+      accounts,
       restful: true,
       gas: 10000000,
     },

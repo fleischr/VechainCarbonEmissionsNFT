@@ -7,7 +7,7 @@
 const hre = require("hardhat/types");
 const deployFunction = require("hardhat-deploy/types");
 
-async function main() {
+const main = async function(hre) {
   const { deployer } = await hre.getNamedAccounts();
   //const emissionsNFTFactory = await hre.ethers.deployContract("emissionsNFTFactory", [], {});
   //await emissionsNFTFactory.waitForDeployment();
@@ -19,9 +19,14 @@ async function main() {
   );
 }
 
+main.id = "emissionsNFTFactory";
+main.tags = ['regular'];
+
+export default main;
+
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+//main().catch((error) => {
+//  console.error(error);
+//  process.exitCode = 1;
+//});
