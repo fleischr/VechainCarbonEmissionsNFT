@@ -1,36 +1,23 @@
-const { ethers, getNamedAccounts } = require("hardhat");
+const { ethers } = require("hardhat");
 
-async function main() {
-  //const emissionsNFTFactory = await hre.ethers.deployContract("emissionsNFTFactory", [], {});
-  //await emissionsNFTFactory.waitForDeployment();
-
-  console.log("deploying emissionsNFT contract...");
-
+async function deployFunc({ getNamedAccounts, deployments }) {
+  const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  const deployerSigner = await ethers.getSigner(deployer);
 
-  const MyContract = await ethers.getContractFactory("emissionsNFT", deployerSigner);
-  const myContract = await MyContract.deploy();
+  console.log("deploying my emissionsNFT contract...");
 
-  await myContract.deployed();
+  const anchorContract = "0x1234567890abcdef1234567890abcdef12345678";
 
-  console.log("emissionsNFT deployed to:", myContract.address);
+  // Deploy the contract using Hardhat Deploy's deploy function
+  const deploymentResult = await deploy("emissionsNFT", {
+    from: deployer,
+    args: [anchorContract],
+    log: true,
+  });
 
-/*  const emissionsNFT = await hre.deployments.deploy('emissionsNFT', { from: deployer});
-
-  console.log(
-    `EmissionsNFT Contract deployed to ${emissionsNFT.target}`
-  );*/
+  console.log("emissionsNFT deployed to:", deploymentResult.address);
 }
 
-main.id = "emissionsNFT";
-main.tags = ['regular'];
+module.exports = deployFunc;
 
-//export default main;
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+deployFunc.tags = ['regular'];
