@@ -12,21 +12,21 @@ const main = async function(hre) {
   //const emissionsNFTFactory = await hre.ethers.deployContract("emissionsNFTFactory", [], {});
   //await emissionsNFTFactory.waitForDeployment();
 
-  await hre.deployments.deploy('emissionsNFTFactory', { from: deployer});
+  const emissionsNFT = await hre.deployments.deploy('emissionsNFT', { from: deployer});
 
   console.log(
-    `EmissionsNFT Factory Contract deployed to ${emissionsNFTFactory.target}`
+    `EmissionsNFT Contract deployed to ${emissionsNFT.target}`
   );
 }
 
-main.id = "emissionsNFTFactory";
+main.id = "emissionsNFT";
 main.tags = ['regular'];
 
-export default main;
+//export default main;
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-//main().catch((error) => {
-//  console.error(error);
-//  process.exitCode = 1;
-//});
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
