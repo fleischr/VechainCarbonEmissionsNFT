@@ -31,7 +31,9 @@
     "@openzeppelin/contracts-upgradeable": "4",
     "@openzeppelin/hardhat-upgrades": "^3.0.5",
     "@vechain.energy/hardhat-deploy": "^0.11.46",
-    "ethereumjs-util": "^7.1.5"
+    "bent": "^7.3.12",
+    "ethereumjs-util": "^7.1.5",
+    "thor-devkit": "^2.0.9"
   },
   "scripts": {
     "build": "hardhat compile",
