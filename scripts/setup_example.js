@@ -1,7 +1,8 @@
 const fs = require('fs');
-require('dotenv');
+const dotenv = require('dotenv');
 const { Transaction, secp256k1 } = require('thor-devkit')
-const bent = require('bent')
+const bent = require('bent');
+const { ethers } = require('ethers');
 
 const deployedContract = "0x0F7666508Ca42b92aB81B525A818F11492d057f1";
 const deployedNetwork = "vechain_testnet";
@@ -15,18 +16,45 @@ var emissionsDataSample = {
 
 async function main() {
 
+  // setup helper functions for http-requests
+  const get = bent('GET', 'https://node-testnet.vechain.energy', 'json')
+  const post = bent('POST', 'https://node-testnet.vechain.energy', 'json')
+  const getSponsorship = bent('POST', 'https://sponsor-testnet.vechain.energy', 'json')
+
     console.log("Getting emissions NFT ABI");
     const emissionsNFT_abi = JSON.parse(fs.readFileSync('../deployments/vechain_testnet/emissionsNFT.json', 'utf-8'));
     console.log(emissionsNFT_abi);
 
+    dotenv.config({ path: '../.env' });
     const PRIVATE_KEY = process.env.PRIVATE_KEY;
+    console.log(PRIVATE_KEY);
+    const wallet = new ethers.Wallet(PRIVATE_KEY);
 
     const nftcontract = new ethers.Interface(emissionsNFT_abi.abi);
     const clauses = [{
-      to: address,
+      to: deployedContract,
       value: '0x0',
       data: nftcontract.encodeFunctionData("defineGHGOrg", [GHGOrgId,GHGOrgDescription])
     }];
+
+      // fetch status information for the network
+  const bestBlock = await get('/blocks/best');
+  const genesisBlock = await get('/blocks/0');
+
+  // build the transaction
+  const transaction = new Transaction({
+    chainTag: Number.parseInt(genesisBlock.id.slice(-2), 16),
+    blockRef: bestBlock.id.slice(0, 18),
+    expiration: 32,
+    clauses,
+    gas: bestBlock.gasLimit,
+    gasPriceCoef: 0,
+    dependsOn: null,
+    nonce: Date.now(),
+    reserved: {
+      features: 1
+    }
+  });
 
       // simulate the transaction
     const tests = await post('/accounts/*', {
